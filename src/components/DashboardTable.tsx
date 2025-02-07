@@ -507,275 +507,389 @@ const DashboardTable = () => {
   }
 
   return (
-    <div className="w-full">
-      <div className="flex flex-col gap-4 mb-4">
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2 items-center">
-            <Select value={currentMonth} onValueChange={setCurrentMonth}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Selecione o mês" />
-              </SelectTrigger>
-              <SelectContent>
-                {months.map((month) => (
-                  <SelectItem key={month.id} value={month.name}>
-                    {month.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Dialog open={isNewMonthDialogOpen} onOpenChange={setIsNewMonthDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Mês
+    <div className="w-full max-w-[1200px] mx-auto p-4">
+      {/* Cabeçalho com controles */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        {/* Controles do lado esquerdo */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Select value={currentMonth} onValueChange={setCurrentMonth}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Selecione o mês" />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month) => (
+                <SelectItem key={month.id} value={month.name}>
+                  {month.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Dialog open={isNewMonthDialogOpen} onOpenChange={setIsNewMonthDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon" className="shrink-0">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Mês</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Nome do Mês</Label>
+                  <Input
+                    placeholder="Ex: JANEIRO/25"
+                    value={newMonth}
+                    onChange={(e) => setNewMonth(e.target.value.toUpperCase())}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={handleAddMonth}>Adicionar</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isDeleteMonthDialogOpen} onOpenChange={setIsDeleteMonthDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="text-red-500 hover:text-red-700 shrink-0"
+                disabled={!currentMonth}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Deletar Mês</DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <p>Tem certeza que deseja deletar o mês {currentMonth}?</p>
+                <p className="text-red-500 mt-2">Esta ação não pode ser desfeita!</p>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsDeleteMonthDialogOpen(false)}>
+                  Cancelar
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Adicionar Novo Mês</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="month">Nome do Mês</Label>
-                    <Input
-                      id="month"
-                      placeholder="ex: JANEIRO/25"
-                      value={newMonth}
-                      onChange={(e) => setNewMonth(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <Button onClick={handleAddMonth}>Adicionar</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Dialog open={isDeleteMonthDialogOpen} onOpenChange={setIsDeleteMonthDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="text-red-500 hover:text-red-700">
-                  <Trash2 className="w-4 h-4" />
+                <Button variant="destructive" onClick={handleDeleteMonth}>
+                  Deletar
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Deletar Mês</DialogTitle>
-                </DialogHeader>
-                <div className="py-4">
-                  <p>Tem certeza que deseja deletar o mês {currentMonth}?</p>
-                  <p className="text-red-500 mt-2">Esta ação não pode ser desfeita!</p>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Controles do lado direito */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Input
+            placeholder="Pesquisar..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-[200px]"
+          />
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={handleScreenshot}
+            className="shrink-0"
+            disabled={!currentMonth}
+            title="Screenshot"
+          >
+            <Camera className="h-4 w-4" />
+          </Button>
+          <Dialog open={isNewEntryDialogOpen} onOpenChange={setIsNewEntryDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                size="icon"
+                className="shrink-0"
+                disabled={!currentMonth}
+                title="Nova Sub"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Nova Sub</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>SUB</Label>
+                  <Input
+                    value={newEntry.dispos || ""}
+                    onChange={(e) => setNewEntry({ ...newEntry, dispos: e.target.value })}
+                    placeholder="Ex: ADR 1"
+                  />
                 </div>
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setIsDeleteMonthDialogOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button variant="destructive" onClick={handleDeleteMonth}>
-                    Deletar
-                  </Button>
+                <div className="space-y-2">
+                  <Label>Líder</Label>
+                  <Input
+                    value={newEntry.lider || ""}
+                    onChange={(e) => setNewEntry({ ...newEntry, lider: e.target.value })}
+                    placeholder="Nome do líder"
+                  />
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Pesquisar..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-[200px]"
-            />
-            <Button variant="outline" size="sm" onClick={handleScreenshot}>
-              <Camera className="w-4 h-4 mr-2" />
-              {!isMobile && "Screenshot"}
-            </Button>
-            <Dialog open={isNewEntryDialogOpen} onOpenChange={setIsNewEntryDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {!isMobile && "Nova Sub"}
+                <div className="space-y-2">
+                  <Label>Células</Label>
+                  <Input
+                    type="number"
+                    value={newEntry.celulas || ""}
+                    onChange={(e) => setNewEntry({ ...newEntry, celulas: Number(e.target.value) })}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Meta</Label>
+                  <Input
+                    type="number"
+                    value={newEntry.meta || ""}
+                    onChange={(e) => setNewEntry({ ...newEntry, meta: Number(e.target.value) })}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Arrecadado</Label>
+                  <Input
+                    type="number"
+                    value={newEntry.arrecadado || ""}
+                    onChange={(e) => setNewEntry({ ...newEntry, arrecadado: Number(e.target.value) })}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsNewEntryDialogOpen(false)}>
+                  Cancelar
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Nova Sub</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="dispos">Sub</Label>
-                    <Input
-                      id="dispos"
-                      value={newEntry.dispos || ""}
-                      onChange={(e) => setNewEntry({ ...newEntry, dispos: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="lider">Líder</Label>
-                    <Input
-                      id="lider"
-                      value={newEntry.lider || ""}
-                      onChange={(e) => setNewEntry({ ...newEntry, lider: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="celulas">Células</Label>
-                    <Input
-                      id="celulas"
-                      type="number"
-                      value={newEntry.celulas || ""}
-                      onChange={(e) => setNewEntry({ ...newEntry, celulas: Number(e.target.value) })}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="meta">Meta</Label>
-                    <Input
-                      id="meta"
-                      type="number"
-                      step="0.01"
-                      value={newEntry.meta || ""}
-                      onChange={(e) => setNewEntry({ ...newEntry, meta: Number(e.target.value) })}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="arrecadado">Arrecadado</Label>
-                    <Input
-                      id="arrecadado"
-                      type="number"
-                      step="0.01"
-                      value={newEntry.arrecadado || ""}
-                      onChange={(e) => setNewEntry({ ...newEntry, arrecadado: Number(e.target.value) })}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <Button onClick={handleAddNew}>Adicionar</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+                <Button onClick={handleAddNew}>Adicionar</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      <div ref={tableRef} className="rounded-md border" id="dashboard-table">
-        <div className="bg-[#4CAF50] text-white p-2 text-center text-lg font-bold">
-          PD ADRENALINA {currentMonth}
+      {/* Tabela responsiva */}
+      <div className="bg-white rounded-lg shadow" ref={tableRef}>
+        <div className="p-4 bg-[#4CAF50] text-white text-center font-bold text-lg sm:text-xl">
+          PD ADRENALINA {currentMonth || "Selecione um mês"}
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">SUB</TableHead>
-              <TableHead>LÍDER</TableHead>
-              <TableHead className="text-center">CÉLULAS</TableHead>
-              <TableHead className="text-right">META</TableHead>
-              <TableHead className="text-right">ARRECADADO</TableHead>
-              <TableHead className="text-right">%</TableHead>
-              <TableHead className="text-center">AÇÕES</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredEntries.map((entry) => {
-              const percentage = entry.meta ? (entry.arrecadado / entry.meta) * 100 : 0;
-              return (
-                <TableRow key={`${entry.month_id}-${entry.dispos}`}>
-                  <TableCell className="font-medium">{entry.dispos}</TableCell>
-                  <TableCell>{entry.lider}</TableCell>
-                  <TableCell className="text-center">{entry.celulas}</TableCell>
-                  <TableCell className="text-right">
-                    {formatCurrency(entry.meta)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {formatCurrency(entry.arrecadado)}
-                  </TableCell>
-                  <TableCell 
-                    className={clsx(
-                      "text-right",
-                      percentage >= 100 ? "text-green-600" :
-                      percentage >= 70 ? "text-yellow-600" :
-                      "text-red-600"
-                    )}
-                  >
-                    {percentage.toFixed(1)}%
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex justify-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          setEditingEntry(entry);
-                          setIsEditDialogOpen(true);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteEntry(entry.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+        
+        {/* Versão mobile - cards */}
+        <div className="block sm:hidden">
+          {isLoading ? (
+            <div className="p-4 text-center">Carregando...</div>
+          ) : filteredEntries.length === 0 ? (
+            <div className="p-4 text-center">Nenhum registro encontrado</div>
+          ) : (
+            <div className="divide-y">
+              {filteredEntries.map((entry) => {
+                const percentage = entry.meta ? (entry.arrecadado / entry.meta) * 100 : 0;
+                return (
+                  <div key={`${entry.month_id}-${entry.dispos}`} className="p-4 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <div className="font-medium">{entry.dispos}</div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setEditingEntry(entry);
+                            setIsEditDialogOpen(true);
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteEntry(entry.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
+                    <div className="text-sm text-gray-600">Líder: {entry.lider}</div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>Células: {entry.celulas}</div>
+                      <div>Meta: {formatCurrency(entry.meta)}</div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div>Arrecadado: {formatCurrency(entry.arrecadado)}</div>
+                      <div 
+                        className={clsx(
+                          "font-medium",
+                          percentage >= 100 ? "text-green-600" :
+                          percentage >= 70 ? "text-yellow-600" :
+                          "text-red-600"
+                        )}
+                      >
+                        {percentage.toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Versão desktop - tabela */}
+        <div className="hidden sm:block overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">SUB</TableHead>
+                <TableHead className="min-w-[150px]">LÍDER</TableHead>
+                <TableHead className="text-center">CÉLULAS</TableHead>
+                <TableHead className="text-right">META</TableHead>
+                <TableHead className="text-right">ARRECADADO</TableHead>
+                <TableHead className="text-right w-[80px]">%</TableHead>
+                <TableHead className="text-center w-[100px]">AÇÕES</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    Carregando...
                   </TableCell>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              ) : filteredEntries.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    Nenhum registro encontrado
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredEntries.map((entry) => {
+                  const percentage = entry.meta ? (entry.arrecadado / entry.meta) * 100 : 0;
+                  return (
+                    <TableRow key={`${entry.month_id}-${entry.dispos}`}>
+                      <TableCell className="font-medium">{entry.dispos}</TableCell>
+                      <TableCell>{entry.lider}</TableCell>
+                      <TableCell className="text-center">{entry.celulas}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(entry.meta)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(entry.arrecadado)}
+                      </TableCell>
+                      <TableCell 
+                        className={clsx(
+                          "text-right whitespace-nowrap",
+                          percentage >= 100 ? "text-green-600" :
+                          percentage >= 70 ? "text-yellow-600" :
+                          "text-red-600"
+                        )}
+                      >
+                        {percentage.toFixed(1)}%
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setEditingEntry(entry);
+                              setIsEditDialogOpen(true);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteEntry(entry.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
+      {/* Modal de edição */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Editar Sub</DialogTitle>
+            <DialogTitle>Editar Entrada</DialogTitle>
           </DialogHeader>
           {editingEntry && (
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="edit-dispos">Sub</Label>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>SUB</Label>
                 <Input
-                  id="edit-dispos"
                   value={editingEntry.dispos}
-                  onChange={(e) => setEditingEntry({ ...editingEntry, dispos: e.target.value })}
+                  onChange={(e) =>
+                    setEditingEntry({ ...editingEntry, dispos: e.target.value })
+                  }
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-lider">Líder</Label>
+              <div className="space-y-2">
+                <Label>Líder</Label>
                 <Input
-                  id="edit-lider"
                   value={editingEntry.lider}
-                  onChange={(e) => setEditingEntry({ ...editingEntry, lider: e.target.value })}
+                  onChange={(e) =>
+                    setEditingEntry({ ...editingEntry, lider: e.target.value })
+                  }
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-celulas">Células</Label>
+              <div className="space-y-2">
+                <Label>Células</Label>
                 <Input
-                  id="edit-celulas"
                   type="number"
                   value={editingEntry.celulas}
-                  onChange={(e) => setEditingEntry({ ...editingEntry, celulas: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setEditingEntry({
+                      ...editingEntry,
+                      celulas: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-meta">Meta</Label>
+              <div className="space-y-2">
+                <Label>Meta</Label>
                 <Input
-                  id="edit-meta"
                   type="number"
-                  step="0.01"
                   value={editingEntry.meta}
-                  onChange={(e) => setEditingEntry({ ...editingEntry, meta: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setEditingEntry({
+                      ...editingEntry,
+                      meta: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-arrecadado">Arrecadado</Label>
+              <div className="space-y-2">
+                <Label>Arrecadado</Label>
                 <Input
-                  id="edit-arrecadado"
                   type="number"
-                  step="0.01"
                   value={editingEntry.arrecadado}
-                  onChange={(e) => setEditingEntry({ ...editingEntry, arrecadado: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setEditingEntry({
+                      ...editingEntry,
+                      arrecadado: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
             </div>
           )}
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancelar
+            </Button>
             <Button onClick={handleEditEntry}>Salvar</Button>
           </div>
         </DialogContent>
